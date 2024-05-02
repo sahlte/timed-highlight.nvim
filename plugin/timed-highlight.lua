@@ -1,8 +1,17 @@
 -- ensure n and N highlight for only a brief time
-local lua_command_string = ":lua require('timed-highlight').turn_off_highlight_after_expiration()<CR>"
 
-vim.api.nvim_set_keymap('n', 'n', 'n' .. lua_command_string, { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', 'N', 'N' .. lua_command_string, { noremap = true, silent = true })
+local function searchAndOpenFold(key)
+    vim.cmd('normal! ' .. key)
+
+    if string.find(vim.o.foldopen, "search") and vim.fn.foldclosed('.') ~= -1 then
+        vim.cmd('normal! zv')
+    end
+
+    require('timed-highlight').turn_off_highlight_after_expiration()
+end
+
+vim.keymap.set('n', 'n', function() searchAndOpenFold('n') end, {noremap = true, silent = true})
+vim.keymap.set('n', 'N', function() searchAndOpenFold('N') end, {noremap = true, silent = true})
 
 -- ensure the initial lookup using / or ? highlight for only a brief time
 vim.api.nvim_create_autocmd("CmdlineLeave", {
